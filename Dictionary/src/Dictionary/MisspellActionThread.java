@@ -17,6 +17,7 @@ public class MisspellActionThread implements Runnable {
     private LinesToDisplay myLines;
     private DictionaryInterface<String, String> myDictionary;
     private boolean dictionaryLoaded;
+    private Wordlet words;
 
     /**
      * Constructor for objects of class MisspellActionThread
@@ -33,26 +34,25 @@ public class MisspellActionThread implements Runnable {
         myDictionary = new HashedMapAdaptor<String, String>();
         myLines = new LinesToDisplay();
         dictionaryLoaded = false;
-
     }
 
     @Override
     public void run() {
 
         // ADD CODE HERE TO LOAD DICTIONARY
-
-
+        loadDictionary(dictionaryFileName, myDictionary);
+        checkWords(textFileName, myDictionary);
         Platform.runLater(() -> {
             if (dictionaryLoaded) {
-               controller.SetMsg("The Dictionary has been loaded"); 
+                controller.SetMsg("The Dictionary has been loaded");
             } else {
-               controller.SetMsg("No Dictionary is loaded"); 
+                controller.SetMsg("No Dictionary is loaded");
             }
         });
-        
-        // ADD CODE HERE TO CALL checkWords
-        
-
+        //myLines.addWordlet(new Wordlet("abc", true));
+        //myLines.addWordlet(new Wordlet("def", false));
+        // showLines(myLines);
+        // myLines.nextLine();
     }
 
     /**
@@ -66,14 +66,14 @@ public class MisspellActionThread implements Runnable {
         Scanner input;
         try {
             String inString;
-            String correctWord;
 
             input = new Scanner(new File(theFileName));
+            while (input.hasNext()) {
+                inString = input.nextLine();
+                theDictionary.add(inString, inString);
+            }
+            dictionaryLoaded = true;
 
-            // ADD CODE HERE TO READ WORDS INTO THE DICTIONARY     
-
-            
-            
         } catch (IOException e) {
             System.out.println("There was an error in reading or opening the file: " + theFileName);
             System.out.println(e.getMessage());
@@ -93,15 +93,22 @@ public class MisspellActionThread implements Runnable {
             String aWord;
 
             input = new Scanner(new File(theFileName));
-            // ADD CODE HERE    
+            while (input.hasNext()) {
+                inString = input.nextLine();
+                StringTokenizer tokens = new StringTokenizer(inString, "=-{}[]~<>@#$%^&*,; )(!?.|\"\'", true);  //make a string separated by commas
+                while (tokens.hasMoreTokens()) {
+                    aWord = tokens.nextToken();
+                    words = new Wordlet(aWord, checkWord(aWord, theDictionary));
+                    myLines.addWordlet(words);
+                }
+                showLines(myLines);
+                myLines.nextLine();
+            }
 
-            
-            
         } catch (IOException e) {
             System.out.println("There was an error in reading or opening the file: " + theFileName);
             System.out.println(e.getMessage());
         }
-
     }
 
     /**
@@ -109,15 +116,22 @@ public class MisspellActionThread implements Runnable {
      *
      */
     public boolean checkWord(String word, DictionaryInterface<String, String> theDictionary) {
-        boolean result = false;
 
-        // ADD CODE HERE    
+        char ch;
+        boolean alphaChar = false;
+        for (int i = 0; i < word.length(); i++) {
+            ch = word.charAt(i);
+            if (Character.isLetter(ch)) {
+                alphaChar = true;
+            } else {
+                return true;
+            }
+        }//end forloop
+        if (alphaChar == true) {
+            alphaChar = theDictionary.contains(word);
+        }
 
-        
-        
-
-        return result;
-
+        return alphaChar;
     }
 
     private void showLines(LinesToDisplay lines) {

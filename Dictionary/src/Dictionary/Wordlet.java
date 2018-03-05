@@ -15,7 +15,7 @@ public class Wordlet
     public Wordlet(String word, boolean spelling)
     {
         myWord = word;
-        spelledCorrectly = spelling;
+        spelledCorrectly = spelling; //boolean
     }
     
     /**
