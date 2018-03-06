@@ -1,8 +1,5 @@
 package Dictionary;
 
-import java.util.Iterator;
-import java.util.*;
-
 
 /**
  * A class that will be used to display the lines of text that are corrected.
